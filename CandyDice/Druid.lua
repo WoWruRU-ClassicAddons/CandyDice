@@ -16,7 +16,7 @@ CandyDice.defaults["DRUID"]  = {
         cooldown = true
     },
     --- Swiftmend not in BabbleSpell, TOOD: fix
-    ["Swiftmend"] = {
+    ["Быстрое восстановление"] = {
         colors = {"7AFF4C"},
         buff = false,
         cooldown = true
@@ -57,7 +57,7 @@ CandyDice.defaults["DRUID"]  = {
         cooldown = true
     },
     --- This isn't in BabbleSpell either
-    ["Faerie Fire (Feral)"] = {
+    ["Волшебный огонь (зверь)"] = {
         colors = {"E24CFD"},
         buff = false,
         cooldown = true

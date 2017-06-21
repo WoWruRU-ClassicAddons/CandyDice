@@ -14,6 +14,180 @@ local function GetTable() return compost and compost:Acquire() or {} end
 local function RecycleTable(t) if compost then compost:Reclaim(t) end end
 
 cd:RegisterDB("CandyDiceDBPerChar")
+if (GetLocale() == "ruRU") then -- locale
+cd.cmdtable = {type="group",handler=CandyDice,args = {
+    timers = {
+        type="group",
+        name="Timers",
+        desc="Команды для таймера способностей",
+        args = {
+            show = {
+                type="toggle",
+                name="Show Anchor",
+                desc="Отобразить окно таймера для закрепления",
+                get=function() return CandyDiceAnchorFrame:IsShown() end,
+                set=function(show) if show then CandyDiceAnchorFrame:Show() else CandyDiceAnchorFrame:Hide() end end
+            },
+            center = {
+                type="toggle",
+                name="Center Timers",
+                desc="Выровнять по центру",
+                get=function() return CandyDice.db.profile.options["center"] end,
+                set="SetCentered"
+            },
+            enable = {
+                type="toggle",
+                name="Enabled",
+                desc="Включить показ таймера способностей",
+                get=function() return CandyDice.db.profile.options["buffs"] end,
+                set=function(v) if v then CandyDice:EnableBuffs() else CandyDice:DisableBuffs() end end
+            },
+            grow = {
+                type="toggle",
+                name="Grow Upward",
+                desc="Когда включена данная функция, бары вытянутся вверх. В противном случае, опустятся ниже",
+                get=function() return CandyDice.db.profile.options.grow end,
+                set=function(v)
+                        CandyDice:Debug(v)
+                        CandyDice.db.profile.options.grow = v
+                        CandyDice:UpdateGrowth()
+                end
+            },
+            scale = {
+                type="range",
+                name="Scale",
+                min=.1,
+                max=10,
+                desc="Масштабирование баров таймера",
+                get=function() return CandyDice.db.profile.options.scale end,
+                set=function(v)
+                    CandyDice.db.profile.options.scale = v
+                    CandyDice:Setup()
+                end
+            },
+            icon = {
+                type="toggle",
+                name="Show Icon",
+                desc="Переключение на показ иконок на барах таймера",
+                get=function()
+                    return CandyDice.db.profile.options.icon
+                end,
+                set=function(v)
+                    if v then 
+                        CandyDice.db.profile.options.icon = true 
+                    else 
+                        CandyDice.db.profile.options.icon = false 
+                    end
+                    CandyDice:Setup()
+                end,
+            },
+        },
+    },
+    cooldowns = {
+        type="group",
+        name="Cooldowns",
+        desc="Команды для таймера времени восстановления",
+        args = {
+            show = {
+                type="toggle",
+                name="Show Anchor",
+                desc="Отобразить окно таймера для закрепления",
+                get=function() return CandyDiceCooldownAnchorFrame:IsShown() end,
+                set=function(show) if show then CandyDiceCooldownAnchorFrame:Show() else CandyDiceCooldownAnchorFrame:Hide() end end
+            },
+            enable = {
+                type="toggle",
+                name="Enabled",
+                desc="Включить\Выключить сканирования восстановления",
+                get=function() return CandyDice.db.profile.options.cooldowns end,
+                set=function(v) if v then CandyDice:EnableCooldowns() else CandyDice:DisableCooldowns() end end
+            },
+            grow = {
+                type="toggle",
+                name="Grow Upward",
+                desc="Когда включена данная функция, бары вытянутся вверх. В противном случае, опустятся ниже",
+                get=function() return CandyDice.db.profile.options.growcd end,
+                set=function(v)
+                        CandyDice:Debug(v)
+                        CandyDice.db.profile.options.growcd = v;
+                        CandyDice:UpdateGrowth();
+                end
+            },
+            scale = {
+                type="range",
+                name="Scale",
+                min=.1,
+                max=10,
+                desc="Масштабирование баров восстановления",
+                get=function() return CandyDice.db.profile.options.scalecd end,
+                set=function(v)
+                    CandyDice.db.profile.options.scalecd = v
+                    CandyDice:Setup()
+                end
+            },
+            reversed = {
+                type="toggle",
+                name="Reversed",
+                desc="Управление баром восстановления",
+                get=function()
+                    return CandyDice.db.profile.options.reversecd
+                end,
+                set=function(v)
+                    if (v) then 
+                        CandyDice.db.profile.options.reversecd = true
+                    else
+                        CandyDice.db.profile.options.reversecd = false
+                    end
+                    CandyDice:Setup()
+                end
+            },
+            icon = {
+                type="toggle",
+                name="Show Icon",
+                desc="Переключение на показ иконок на барах восстановления",
+                get=function()
+                    return CandyDice.db.profile.options.iconcd
+                end,
+                set=function(v)
+                    if v then 
+                        CandyDice.db.profile.options.iconcd = true 
+                    else 
+                        CandyDice.db.profile.options.iconcd = false 
+                    end
+                    CandyDice:Setup()
+                end,
+            }
+        },
+    },
+    reset = {
+        type="execute",
+        name="Reset Settings",
+        desc="Установить все настройки по умолчанию",
+        func=function() CandyDice:ResetDB("profile");CandyDice:Setup() end,
+        order=5000
+    },
+    version = {
+        type="execute",
+        name="Report Version",
+        desc="Отобразить используемую версию CandyDice",
+        func=function() CandyDice:Print(CandyDice.revision) end
+    },
+    texture = {
+        type="text",
+        name="Bar Texture",
+        desc="Текстура для использования баров",
+        validate=CandyDice.texturenames,
+        set=function(v)
+            CandyDice.db.profile.options.texture = v
+            CandyDice:Setup()
+        end,
+        get=function()
+            return CandyDice.db.profile.options.texture
+        end,
+    }
+}
+}
+else
 cd.cmdtable = {type="group",handler=CandyDice,args = {
     timers = {
         type="group",
@@ -186,7 +360,7 @@ cd.cmdtable = {type="group",handler=CandyDice,args = {
     }
 }
 }
-
+end
 cd.defaults = {}
 cd:RegisterDefaults(
     'profile',
@@ -338,6 +512,81 @@ function CandyDice:GetFuncsForBuff(buff)
 end
 
 function CandyDice:PushTrackedToOptions()
+if (GetLocale() == "ruRU") then
+    local header = {
+        name="Abilities",
+        desc="Сканирование способностей и эффектов",
+        type="group",
+        args = {
+            addnew={
+                type="text",
+                name="Add New",
+                usage="/cdice abilities addnew <ability name>",
+                order=1,
+                desc="Добавить новую способность для отслеживания",
+                get=false,
+                set=function(v)
+                    CandyDice:AddNewAbility(v)
+                end,
+                message="[%s]: %s has been added to tracked abilities."
+            },
+            spacer={
+                type="header",
+                order=2,
+            },
+        }
+    }
+    for buff in self.db.profile.tracked do
+        if self.db.profile.tracked[buff] then
+            local ftable = self:GetFuncsForBuff(buff)
+            local btable = {
+                name=buff,
+                type="group",
+                desc=buff,
+                args = {
+                    fgcolor= {
+                        type="color",
+                        name="Foreground color",
+                        desc="Цвет переднего плана",
+                        get=ftable["GetFGColor"],
+                        set=ftable["SetFGColor"]
+                    },
+                    bgcolor= {
+                        type="color",
+                        name="Background color",
+                        desc="Цвет заднего фона",
+                        get=ftable["GetBGColor"],
+                        set=ftable["SetBGColor"]  
+                    },
+                    scanbuff={
+                        type="toggle",
+                        name="Scan Buffs",
+                        desc="Сканирование способности на ее положительные эффекты",
+                        get=ftable.GetScanBuff,
+                        set=ftable.SetScanBuff,
+                    },
+                    scancd={
+                        type="toggle",
+                        name="Scan Cooldowns",
+                        desc="Сканирование способности на ее время восстановление",
+                        get=ftable.GetScanCD,
+                        set=ftable.SetScanCD,
+                    },
+                    delete={
+                        type="execute",
+                        name="Delete",
+                        desc="Удалить способность из списка отслеживаемых способностей",
+                        func=ftable.delete
+                    }
+                }
+            }
+            local key = string.lower(buff)
+            key = string.gsub(key, ' ', '_')
+            header.args[key] = btable
+        end --if self.db.profile.tracked[buff] then
+    end --for buff in self.db.profile.tracked
+    self.cmdtable.args["abilities"] = header
+else
     local header = {
         name="Abilities",
         desc="Abilities and buffs scanned",
@@ -411,6 +660,7 @@ function CandyDice:PushTrackedToOptions()
         end --if self.db.profile.tracked[buff] then
     end --for buff in self.db.profile.tracked
     self.cmdtable.args["abilities"] = header
+end
 end
 
 function CandyDice:RegisterColors()

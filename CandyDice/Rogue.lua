@@ -89,7 +89,7 @@ CandyDice.defaults["ROGUE"]  = {
         buff = true,
     },
     -- Crusader - not in Babble spell, needs to be localized manually some day
-    ["Holy Strength"] = {
+    ["Священная сила"] = {
         colors = {"ffff00"},
         cooldown = false,
         buff = true
